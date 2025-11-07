@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>YCNN — 청소년 기후건강 시민간호 프로젝트</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f7fbf9;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#2aa6a6;
+      --accent-2:#6aa96a;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 8px 30px rgba(15,23,42,0.08);
+      --radius:16px;
+      --transition:500ms cubic-bezier(.2,.9,.3,1);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background:linear-gradient(180deg,var(--bg),#eef7f5);
+      color:#0f1724;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      scroll-behavior:smooth;
+      overflow-y:auto;
+    }
+
+    /* Layout: fullpage sections */
+    .nav{
+      position:fixed;top:18px;left:50%;transform:translateX(-50%);
+      display:flex;gap:12px;padding:8px 12px;background:rgba(255,255,255,0.6);
+      backdrop-filter: blur(6px);border-radius:40px;box-shadow:var(--shadow);z-index:60;
+    }
+    .nav a{color:var(--muted);text-decoration:none;font-weight:600;padding:8px 12px;border-radius:10px;transition:all 220ms}
+    .nav a.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 6px 18px rgba(42,166,166,0.14)}
+
+    main{scroll-snap-type:y mandatory;height:100vh;overflow-y:scroll}
+    section{
+      min-height:100vh;padding:64px 8vw;display:flex;align-items:center;justify-content:center;
+      scroll-snap-align:start;position:relative;
+    }
+
+    .container{max-width:1100px;width:100%}
+    .hero{
+      display:grid;grid-template-columns:1fr 420px;gap:40px;align-items:center;
+    }
+    .eyebrow{display:inline-block;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,#e9faf9,#f0fff4);color:var(--accent);font-weight:700;font-size:13px}
+    h1{font-size:40px;margin:14px 0 12px;line-height:1.05}
+    p.lead{color:var(--muted);font-size:17px;line-height:1.6}
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);
+    }
+
+    /* Problem section layout */
+    .problem-grid{display:grid;grid-template-columns:1fr 360px;gap:28px}
+    .stat{
+      display:flex;align-items:center;gap:14px;padding:18px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#f6fffb);
+    }
+    .stat .num{font-size:24px;font-weight:700;color:var(--accent)}
+    .quote{font-style:italic;color:#123;opacity:0.9;margin-top:12px}
+
+    /* Research section */
+    .research-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+    .research-cards .mini{padding:18px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fbfffb);box-shadow:0 6px 24px rgba(17,24,39,0.03)}
+    .mini h4{margin:0 0 8px}
+
+    /* Execution: timeline */
+    .timeline{display:flex;flex-direction:column;gap:18px}
+    .step{
+      display:grid;grid-template-columns:60px 1fr;gap:18px;align-items:start;padding:18px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);
+    }
+    .step .dot{width:46px;height:46px;border-radius:12px;background:linear-gradient(180deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;box-shadow:0 8px 18px rgba(42,166,166,0.12)}
+    .step h3{margin:0 0 6px}
+    .mini-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{background:#f1f8f7;padding:8px 10px;border-radius:999px;font-weight:600;font-size:13px;color:var(--accent)}
+
+    /* Impact section */
+    .impact-grid{display:grid;grid-template-columns:1fr 420px;gap:28px}
+    .kpi{display:flex;flex-direction:column;gap:8px;padding:18px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#f7fffb);box-shadow:var(--shadow)}
+    .kpi .big{font-size:28px;font-weight:700;color:var(--accent)}
+    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+    .photo{height:110px;border-radius:10px;background:linear-gradient(135deg,#dff7f4,#f1fff7);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700}
+
+    /* CTA & bottom */
+    .cta{
+      display:flex;gap:16px;align-items:center;justify-content:space-between;margin-top:18px;padding:20px;border-radius:14px;background:linear-gradient(90deg,#ffffff,#f7fffb);box-shadow:var(--shadow)
+    }
+    .btn{
+      display:inline-block;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;font-weight:700;text-decoration:none;
+      transition:transform 180ms;
+    }
+    .btn:hover{transform:translateY(-3px)}
+
+    /* fixed progress dots on right */
+    .dots{
+      position:fixed;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px;z-index:70;
+    }
+    .dots button{width:12px;height:12px;border-radius:999px;background:#dfe7e6;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(12,20,16,0.06)}
+    .dots button.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));transform:scale(1.25)}
+
+    /* reveal animation */
+    .reveal{opacity:0;transform:translateY(18px);transition:opacity 600ms var(--transition),transform 600ms var(--transition)}
+    .reveal.visible{opacity:1;transform:none}
+
+    /* Responsive */
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr;gap:28px}
+      .problem-grid, .impact-grid{grid-template-columns:1fr}
+      .research-cards{grid-template-columns:repeat(2,1fr)}
+      .research-cards .mini{min-height:120px}
+      .gallery{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:560px){
+      .nav{left:12px;transform:none;top:12px}
+      .nav a{padding:8px}
+      .research-cards{grid-template-columns:1fr}
+      .gallery{grid-template-columns:1fr}
+      .hero h1{font-size:28px}
+      .eyebrow{font-size:12px}
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="섹션 내비게이션">
+    <a href="#problem" class="nav-link active">문제인식</a>
+    <a href="#research" class="nav-link">탐구·준비</a>
+    <a href="#execution" class="nav-link">실행</a>
+    <a href="#impact" class="nav-link">성과·확장</a>
+  </nav>
+
+  <div class="dots" aria-hidden="true">
+    <button data-target="#problem" class="dot active"></button>
+    <button data-target="#research" class="dot"></button>
+    <button data-target="#execution" class="dot"></button>
+    <button data-target="#impact" class="dot"></button>
+  </div>
+
+  <main id="main">
+    <!-- Hero / Intro -->
+    <section id="problem" aria-labelledby="problem-title">
+      <div class="container hero">
+        <div>
+          <span class="eyebrow">YCNN 프로젝트</span>
+          <h1 id="problem-title">기후 변화와 청소년의 건강 — 문제를 발견하고 행동으로 옮기다</h1>
+          <p class="lead">학교에서 경험한 두통, 피로, 집중력 저하 같은 증상들이 단순한 '피로'가 아니라 기후와 연결되어 있다는 의문에서 시작된 학생 주도 간호 프로젝트입니다. 이 페이지는 문제 인식에서부터 준비, 실행, 그리고 성과와 확장까지의 전 과정을 한눈에 보여줍니다.</p>
+
+          <div style="margin-top:20px;display:flex;gap:12px;">
+            <a class="btn" href="#research">프로젝트 보기</a>
+            <a class="btn" style="background:linear-gradient(90deg,#d5e9e8,#bfe8c8);color:#084">참여/문의</a>
+          </div>
+        </div>
+
+        <aside class="card" aria-hidden="false">
+          <h3 style="margin:0 0 10px">한눈에 요약</h3>
+          <p style="margin:0;color:var(--muted)">학생들의 체감 증상 설문 → 기후요소 분석 → 예방 교육과 행동 챌린지 → 정량적·정성적 개선을 확인한 실전형 프로젝트</p>
+          <div style="margin-top:16px;display:grid;gap:10px">
+            <div class="stat reveal">
+              <div style="flex:1">
+                <div class="num">63</div>
+                <div style="color:var(--muted);font-weight:600">참여 학생 수(샘플)</div>
+              </div>
+            </div>
+            <div class="stat reveal">
+              <div style="flex:1">
+                <div class="num">3단계</div>
+                <div style="color:var(--muted);font-weight:600">Awareness → Action → Community</div>
+              </div>
+            </div>
+            <p class="quote">“환경이 아닌 내 건강 문제라는 걸 알게 되었다.” — 참여 학생</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Research -->
+    <section id="research" aria-labelledby="research-title">
+      <div class="container">
+        <div style="display:flex;gap:30px;align-items:flex-start;flex-wrap:wrap">
+          <div style="flex:1;min-width:320px">
+            <h2 id="research-title">탐구 · 준비</h2>
+            <p class="lead">간호학적 근거와 학교 현장의 목소리를 바탕으로 '청소년 맞춤형 기후건강 모델'을 설계했습니다. 단순한 정보전달이 아니라 행동 변화를 일으키는 도구를 만들었습니다.</p>
+
+            <div class="research-cards">
+              <div class="mini reveal">
+                <h4>근거 조사</h4>
+                <p style="margin:0;color:var(--muted)">국내외 기후·건강 보고서와 학교 보건 사례를 분석해 청소년 대상 교육의 필요성을 확인</p>
+              </div>
+              <div class="mini reveal">
+                <h4>핵심 4영역 모델</h4>
+                <p style="margin:0;color:var(--muted)">열 건강 / 공기 건강 / 감정·정신 건강 / 생활습관 건강 — 학생 눈높이 모델</p>
+              </div>
+              <div class="mini reveal">
+                <h4>도구 제작</h4>
+                <p style="margin:0;color:var(--muted)">자가진단 체크리스트, 카드뉴스, 행동 챌린지 활동지, 기후건강 키트 구성안</p>
+              </div>
+            </div>
+
+            <div style="margin-top:18px" class="card reveal">
+              <h4 style="margin:0 0 8px">체크리스트 예시</h4>
+              <ol style="margin:0 0 6px 18px;color:var(--muted)">
+                <li>오늘 물을 4잔 이상 마셨는가?</li>
+                <li>미세먼지 지수를 확인했고 필요 시 실내 활동을 했는가?</li>
+                <li>야외 활동 후 호흡기 증상이 있었는가?</li>
+                <li>기후 관련 불안감이 있었는가?</li>
+              </ol>
+              <div style="margin-top:10px" class="mini-list">
+                <span class="chip">자가진단</span>
+                <span class="chip">교육자료</span>
+                <span class="chip">학생 맞춤</span>
+              </div>
+            </div>
+          </div>
+
+          <aside style="width:360px">
+            <div class="card reveal">
+              <h4 style="margin:0 0 10px">자료 다운로드</h4>
+              <p style="color:var(--muted);margin:0 0 12px">(샘플 리플릿, 체크리스트, 활동지)</p>
+              <div style="display:flex;gap:8px">
+                <a class="btn" href="#" onclick="alert('다운로드 샘플: 리플릿.pdf (미리보기)')">리플릿</a>
+                <a class="btn" style="background:linear-gradient(90deg,#f9d6d6,#ffdede);color:#a42" href="#" onclick="alert('다운로드 샘플: 체크리스트.pdf (미리보기)')">체크리스트</a>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:18px">
+              <h4 style="margin:0 0 10px">교사 인터뷰 하이라이트</h4>
+              <p style="color:var(--muted);margin:0">"학생들이 주도해서 만든 교육 자료라 실제로 반응이 좋았습니다. 보건실에서의 변화도 있었습니다."</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Execution -->
+    <section id="execution" aria-labelledby="execution-title">
+      <div class="container">
+        <h2 id="execution-title">실행 — Awareness · Action · Community</h2>
+        <p class="lead">3단계 프로그램으로 설계하여 실제 행동 변화를 측정했습니다. 아래는 각 단계에서 진행한 활동과 산출물입니다.</p>
+
+        <div style="margin-top:18px" class="timeline">
+          <div class="step reveal">
+            <div class="dot">1</div>
+            <div>
+              <h3>Phase 1 — Awareness (깨닫기)</h3>
+              <p style="margin:6px 0;color:var(--muted)">점심시간 15분 미니 클래스 2회: 폭염 대처법, 미세먼지 행동수칙, 개인 루틴 작성</p>
+              <div class="mini-list">
+                <span class="chip">미니 클래스</span>
+                <span class="chip">서약 카드</span>
+                <span class="chip">실습형 퀴즈</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="dot">2</div>
+            <div>
+              <h3>Phase 2 — Action (실천)</h3>
+              <p style="margin:6px 0;color:var(--muted)">기후건강 키트 제작·배포(샘플 50개), 3-Day Challenge 운영으로 일상습관 변화 유도</p>
+              <div class="mini-list">
+                <span class="chip">키트 제작</span>
+                <span class="chip">챌린지</span>
+                <span class="chip">인증샷</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="dot">3</div>
+            <div>
+              <h3>Phase 3 — Community (확산)</h3>
+              <p style="margin:6px 0;color:var(--muted)">교내 게시판 코너 도입, 보건실 연계 정기 정보 업데이트, 직원 대상 나눔 활동</p>
+              <div class="mini-list">
+                <span class="chip">게시판 코너</span>
+                <span class="chip">보건실 연계</span>
+                <span class="chip">커뮤니티</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;display:flex;gap:18px;flex-wrap:wrap">
+          <div class="card reveal" style="flex:1;min-width:260px">
+            <h4 style="margin:0 0 8px">산출물 샘플</h4>
+            <ul style="margin:0;color:var(--muted)">
+              <li>교육 리플릿 PDF</li>
+              <li>3-Day Challenge 활동지</li>
+              <li>참여 후기 모음 및 설문 데이터</li>
+            </ul>
+          </div>
+
+          <div class="card reveal" style="min-width:260px">
+            <h4 style="margin:0 0 8px">현장 스냅샷</h4>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <div class="photo">사진1</div>
+              <div class="photo">사진2</div>
+              <div class="photo">사진3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Impact -->
+    <section id="impact" aria-labelledby="impact-title">
+      <div class="container">
+        <h2 id="impact-title">성과 · 확장</h2>
+        <p class="lead">정량적 지표와 정성적 피드백을 통해 실제 변화가 나타났으며, 지속가능한 확장 계획을 수립했습니다.</p>
+
+        <div class="impact-grid">
+          <div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+              <div class="kpi reveal">
+                <div class="big">물 섭취 ↑</div>
+                <div style="color:var(--muted)">“하루 4잔 이상” 실천 비율 크게 상승</div>
+              </div>
+              <div class="kpi reveal">
+                <div class="big">미세먼지 행동 ↑</div>
+                <div style="color:var(--muted)">미세먼지 확인 후 행동 실천 비율이 크게 개선</div>
+              </div>
+              <div class="kpi reveal">
+                <div class="big">지식 향상</div>
+                <div style="color:var(--muted)">기후건강 이해도 점수 약 2배 상승</div>
+              </div>
+              <div class="kpi reveal">
+                <div class="big">정서 안정</div>
+                <div style="color:var(--muted)">기후 관련 불안감 감소 경향 관찰</div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px" class="card reveal">
+              <h4 style="margin:0 0 8px">확장 로드맵</h4>
+              <ol style="margin:0 0 6px 18px;color:var(--muted)">
+                <li>학교 내 챕터 구성 및 지속 활동화</li>
+                <li>인근 학교 대상 교육 파일 공유</li>
+                <li>학생 강사단 운영으로 지역 확산</li>
+                <li>청소년용 기후건강 가이드북 제작</li>
+              </ol>
+            </div>
+          </div>
+
+          <aside>
+            <h4 style="margin:0 0 10px">참여 후기</h4>
+            <div class="card reveal" style="padding:16px">
+              <p style="margin:0;color:var(--muted)">"실제 생활에서 바뀐 게 보여서 뿌듯했어요. 학생이 직접 만든 자료라 더 공감됐어요." — 참여 학생</p>
+              <p style="margin:12px 0 0;color:var(--muted)">"보건실 운영 방식에도 소소한 변화가 생겼습니다." — 보건부</p>
+            </div>
+
+            <div class="card reveal" style="margin-top:12px">
+              <h4 style="margin:0 0 8px">참여 방법</h4>
+              <p style="margin:0;color:var(--muted)">소규모로 시작해도 됩니다. 프로젝트 가이드와 자료 템플릿을 공유합니다.</p>
+              <div style="margin-top:10px;display:flex;gap:8px">
+                <a class="btn" href="#" onclick="alert('참여 신청 폼 열기 (샘플)')">참여 신청</a>
+                <a class="btn" style="background:linear-gradient(90deg,#f6f5ff,#e8e2ff);color:#4b2" href="#" onclick="alert('자료 요청 이메일: sample@ycсn.org')">자료 요청</a>
+              </div>
+            </div>
+
+            <div class="card reveal" style="margin-top:12px">
+              <h4 style="margin:0 0 8px">가이드라인</h4>
+              <p style="margin:0;color:var(--muted)">학생 주도, 근거 기반, 행동 중심. 작은 변화가 축적되어 학교 전반의 건강 문화를 바꿉니다.</p>
+            </div>
+
+          </aside>
+        </div>
+
+        <div style="margin-top:26px" class="cta reveal">
+          <div>
+            <strong>YCNN에 참여하고 싶나요?</strong>
+            <div style="color:var(--muted);margin-top:6px">혼자 시작해도 좋고, 친구와 함께 하거나 학교 동아리로 확장해도 됩니다.</div>
+          </div>
+          <div style="display:flex;gap:12px">
+            <a class="btn" href="#" onclick="alert('참여 신청서 샘플을 보냅니다.')">지금 참여하기</a>
+            <a class="btn" style="background:linear-gradient(90deg,#fff3d6,#ffe8c0);color:#a65" href="#" onclick="alert('프로젝트 템플릿 다운로드 (샘플)')">템플릿 받기</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer style="padding:28px 8vw;text-align:center;color:var(--muted)">
+      <div style="max-width:1100px;margin:0 auto">
+        <small>YCNN — 청소년 기후건강 시민간호 프로젝트 • 학생 주도 활동 샘플 페이지</small>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Smooth nav active state + reveal on scroll + dots
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section');
+    const dots = document.querySelectorAll('.dots button');
+    const revealEls = document.querySelectorAll('.reveal');
+
+    // IntersectionObserver for sections to update nav/dots
+    const obsOptions = { root: null, rootMargin: '0px', threshold: 0.45 };
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const id = entry.target.id;
+        const nav = document.querySelector('.nav a[href="#' + id + '"]');
+        const dot = document.querySelector('.dots button[data-target="#' + id + '"]');
+        if(entry.isIntersecting){
+          navLinks.forEach(a=>a.classList.remove('active'));
+          nav && nav.classList.add('active');
+          dots.forEach(d=>d.classList.remove('active'));
+          dot && dot.classList.add('active');
+        }
+      });
+    }, obsOptions);
+    sections.forEach(s=>sectionObserver.observe(s));
+
+    // Reveal on scroll
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if(e.isIntersecting){ e.target.classList.add('visible'); revealObs.unobserve(e.target); }
+      });
+    }, {threshold:0.15});
+    revealEls.forEach(el => revealObs.observe(el));
+
+    // nav click smooth scroll handled by href with smooth behavior; enhance: close mobile menu if any
+    document.querySelectorAll('.nav a').forEach(a => {
+      a.addEventListener('click', (ev) => {
+        navLinks.forEach(n=>n.classList.remove('active'));
+        a.classList.add('active');
+      });
+    });
+
+    // dots click
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        const target = document.querySelector(dot.dataset.target);
+        target && target.scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    });
+
+    // small: keyboard accessibility for dots
+    dots.forEach((d,i)=>d.setAttribute('tabindex',0));
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){
+        e.preventDefault();
+        const active = document.querySelector('.dots button.active');
+        const idx = [...dots].indexOf(active);
+        const next = dots[Math.min(dots.length-1, idx+1)];
+        next && next.click();
+      } else if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){
+        e.preventDefault();
+        const active = document.querySelector('.dots button.active');
+        const idx = [...dots].indexOf(active);
+        const prev = dots[Math.max(0, idx-1)];
+        prev && prev.click();
+      }
+    });
+  </script>
+</body>
+</html>
